@@ -69,17 +69,17 @@ void printRecords(struct RecordType pData[], int dataSz)
 	printf("\n\n");
 }
 
-void insertRecord(struct HashType hashTable[], struct RecordType record, int tableSize){
-	int index = hash(record.id, tableSize);
+void insertRecord(struct HashType *hashTable, struct RecordType *record, int tableSize){
+	int index = hash(record->id, tableSize);
 	if (hashTable[index].ptr == NULL){
-		hashTable[index].ptr = &record;
+		hashTable[index].ptr = record;
 	}
 	else {
 		struct RecordType* curr = hashTable[index].ptr; 
 		while (curr->next != NULL){
 			curr = curr->next;
 		}
-		curr->next = &record;
+		curr->next = record;
 	}
 }
 
@@ -87,17 +87,20 @@ void insertRecord(struct HashType hashTable[], struct RecordType record, int tab
 // skip the indices which are free
 // the output will be in the format:
 // index x -> id, name, order -> id, name, order ....
-void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
+void displayRecordsInHash(struct HashType *hashTable, int tableSize)
 {
 	int i;
 
-	for (i=0;i<hashSz;++i){
+	for (i=0;i<tableSize;++i){
 		// if index is occupied with any records, print all
-		if (pHashArray[i].ptr != NULL){
+		if (hashTable[i].ptr != NULL){
 			printf("Index %d -> ", i);
-			struct RecordType* curr = pHashArray[i].ptr;
+			struct RecordType* curr = hashTable[i].ptr;
 			while (curr != NULL){
-				printf("%d %c %d -> ", curr->id, curr->name, curr->order);
+        printf("[%d, ", curr->id);
+        printf("%c, ", curr->name);
+        printf("%d] -> ", curr->order);
+				//printf("%d %c %d -> ", curr->id, curr->name, curr->order);
 				curr = curr->next;
 			}
 			printf("NULL\n");
@@ -113,10 +116,10 @@ int main(void)
 	recordSz = parseData("input.txt", &pRecords);
 	printRecords(pRecords, recordSz);
 	// Your hash implementation
-	int hashTableSize = 10; 
+	int hashTableSize = 11; 
 	struct HashType* hashTable = (struct HashType*)calloc(hashTableSize, sizeof(struct HashType));
 	for (int i = 0; i < recordSz; ++i){
-		insertRecord(hashTable, *(pRecords + i), hashTableSize);
+		insertRecord(hashTable, (pRecords + i), hashTableSize);
 	}
 
 	displayRecordsInHash(hashTable, hashTableSize);
